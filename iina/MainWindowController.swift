@@ -2164,9 +2164,13 @@ class MainWindowController: PlayerWindowController {
       if let screenFrame = window.screen?.frame {
         rect = rect.constrain(in: screenFrame)
       }
-      // animated `setFrame` can be inaccurate!
-      window.setFrame(rect, display: true, animate: true)
-      window.setFrame(rect, display: true)
+      if player.disableWindowAnimation {
+        window.setFrame(rect, display: true, animate: false)
+      } else {
+        // animated `setFrame` can be inaccurate!
+        window.setFrame(rect, display: true, animate: true)
+        window.setFrame(rect, display: true)
+      }
       updateWindowParametersForMPV(withFrame: rect)
     }
 
@@ -2178,6 +2182,7 @@ class MainWindowController: PlayerWindowController {
 
     // UI and slider
     updatePlayTime(withDuration: true, andProgressBar: true)
+    player.events.emit(.windowSizeAdjusted, data: rect)
   }
 
   func updateWindowParametersForMPV(withFrame frame: NSRect? = nil) {
